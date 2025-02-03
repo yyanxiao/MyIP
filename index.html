@@ -4,431 +4,88 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="keywords" content="IP,IP查询,IP地址查询,IP地址,IP地址归属地,查询本机IP">
+  <meta name="keywords"
+    content="MyIP,IP Tool,My IP,IP check,IP lookup,DNS leak test,WebRTC test,Speed test,DNS lookup,Whois lookup, Ping test, privacy test">
   <meta name="description"
-    content="A better IP Toolbox. Easy to check what's your IPs, IP informations, check for DNS leaks, examine WebRTC connections, and test website availability">
-  <meta name="apple-mobile-web-app-capable" content="yes">
+    content="A better and open source IP Toolbox. Easy to check what's your IPs, IP information, check for DNS leaks, examine WebRTC connections, test website availability, lookup DNS record, lookup Whois, and test latency from around the world.">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="theme-color" content="#f8f9fa">
   <meta name="background-color" content="#ffffff">
-  <link rel="apple-touch-icon" href="res/logo-512.png">
-  <title>查看我的 IP 地址 | 查询本机 IP 地址及归属地 | 查看 WebRTC 连接 IP ｜ DNS 泄露检测 | Jason Ng 阿禅开源作品 </title>
-  <!--  Bootstrap CSS -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-  <link rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.2/font/bootstrap-icons.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.5.0/css/flag-icon.min.css">
-  <link rel="icon" href="favicon.ico">
-  <link rel="stylesheet" href="res/style.css">
-  <link rel="manifest" href="manifest.json">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="apple-touch-icon" href="logos/ios-logo-512.png">
+  <title>IPCheck.ing - Check My IP Address and Geolocation - Check WebRTC Connection IP - DNS Leak Test - Speed Test -
+    Ping/MTR Test - Jason Ng Open Source </title>
+  <link rel="icon" href="logos/logo.svg">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+  <script>
+    setTimeout(() => {
+      document.getElementById('waiting-too-long').innerHTML = `
+        <p>Waiting too long? Try to use <a href="https://lite.ipcheck.ing/">IPCheck.ing Lite</a>.<p>
+        <p>Or refresh the page.</p>`
+    }, 12000)
+  </script>
+
+  <style>
+    .jn-spinner {
+      border: 4px solid rgb(12, 144, 34);
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border-left-color: transparent;
+      animation: spin 1s linear infinite;
+      margin-top: 10px;
+    }
+
+    .jn-loading {
+      margin-top: 30vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .jn-spinner-text {
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    .jn-spinner-text p {
+      font-size: 14px;
+      color: #777;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
 </head>
 
 <body>
-
-  <!-- Loading -->
-  <div id="loading" class="d-flex justify-content-center jn-loading">
-    <div class="spinner-border text-success" role="status">
-      <span class="visually-hidden">Loading...</span>
+  <div id="jn-loading" class="jn-loading">
+    <div>
+      <svg class="me-1" width="100" height="100" xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision"
+        text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd" clip-rule="evenodd"
+        viewBox="0 0 511 512.35">
+        <path
+          d="M162.62,21.9026663 C157.13,27.3326663 151.99,33.9226663 147.2,41.6126663 C129.83,69.4326663 116.87,111.602666 107.28,164.772666 C50.98,175.412666 16.22,198.912666 17.38,222.912666 C18.42,244.652666 45.84,261.322666 87.05,272.832666 C84.34,281.212666 84.98,282.652666 88.65,292.962666 C57.87,305.942666 25.71,345.362666 0,379.892666 L100.03,447.502666 L64.71,512.352666 L449.12,512.352666 L411.86,447.502666 L511,378.632666 C481.92,337.782666 446.81,303.072666 424.88,293.652666 C429.51,281.632666 430.32,279.532666 426.44,272.862666 C467.65,261.142666 494.67,244.022666 494.61,221.392666 C494.55,196.712666 459.11,173.012666 406.3,164.772666 C393.66,111.272666 381.08,69.1526663 365.07,41.5026663 C362.16,36.4826663 359.14,31.9326663 355.98,27.8826663 C308.32,-33.2373337 291.62,25.1926663 257.84,25.1226663 C218.67,25.0426663 213.69,-28.5673337 162.62,21.9026663 Z M223.27,419.802666 C223.27,416.232666 226.17,413.332666 229.74,413.332666 L240.26,413.332666 C241.64,413.332666 242.92,413.772666 243.96,414.502666 C247.73,416.602666 251.42,417.832666 254.97,417.922666 C256.256726,417.95538 257.551379,417.837477 258.853959,417.554552 C261.134997,417.059103 263.440344,416.057596 265.77,414.472666 C266.837339,413.754341 268.093464,413.368108 269.38,413.362666 L282.16,413.332666 C285.73,413.332666 288.62,416.232666 288.62,419.802666 C288.62,423.372666 285.73,426.272666 282.16,426.272666 L271.21,426.272666 C265.75,429.542666 260.23,430.942666 254.67,430.802666 C249.23,430.662666 243.89,429.032666 238.66,426.272666 L229.74,426.272666 C226.17,426.272666 223.27,423.372666 223.27,419.802666 Z M160.62,279.492666 C221.05,301.232666 281.49,300.872666 341.92,281.322666 C283.47,286.072666 219.13,284.942666 160.62,279.492666 Z M267.04,306.612666 L244.93,306.612666 C210.81,384.892666 122.79,350.782666 142.77,277.672666 C135.46,276.872666 128.26,275.992666 121.21,275.052666 L120.89,276.932666 L120.3,280.492666 L116.82,301.362666 C86.43,294.642666 103.46,373.132666 131.08,366.232666 C135.3,378.412666 136.442197,389.44711 142.34,398.422666 C171.368144,442.599077 205.648487,494.791988 256.040415,494.791988 C306.432342,494.791988 341.594767,438.778379 368.99,398.422666 C375.513955,388.812277 376.14,383.142666 380.53,369.392666 C405.97,373.452666 426.88,296.082666 395.87,301.762666 L392.68,280.712666 L392.13,277.062666 L391.9,275.522666 C384.43,276.682666 376.78,277.722666 368.99,278.632666 C389.88,349.262666 300.46,385.132666 267.04,306.612666 Z M284.280512,176.166601 L284.280512,67.1666006 C366.547618,67.1666006 361.40053,176.166601 284.280512,176.166601 Z M170.780508,409.666601 C182.571845,404.08157 211.029823,401.289054 256.154442,401.289054 C301.27906,401.289054 329.487749,404.08157 340.780508,409.666601 C340.780508,398.413948 339.802073,389.918194 323.84137,384.371704 C288.837937,372.207694 222.824258,373.335802 189.15409,384.371704 C170.816498,390.382125 170.780508,397.067154 170.780508,409.666601 Z M206.779566,446.766602 C218.286957,452.470688 235.027101,455.322731 257,455.322731 C278.972899,455.322731 295.566401,452.470688 306.780508,446.766602 C306.780508,458.019255 306.204953,466.515009 296.816215,472.061498 C286.632212,478.077798 271.985838,480.842479 257.386147,480.76502 C242.467564,480.685868 227.597726,477.639061 217.587657,472.061498 C206.800736,466.051077 206.779566,459.366048 206.779566,446.766602 Z M256.254843,67.1117579 L229.254843,87.6169826 C229.254843,124.271828 229.254843,160.370447 229.254843,204.775426 L256.254843,208.111758 C256.254843,143.245746 256.254843,107.726499 256.254843,67.1117579 Z M207.254843,67.1117579 L180.254843,87.6169826 C180.254843,124.271828 180.254843,160.370447 180.254843,204.775426 L207.254843,208.111758 C207.254843,143.245746 207.254843,107.726499 207.254843,67.1117579 Z"
+          id="Logo" fill="#212529"></path>
+      </svg>
     </div>
+    <div class="jn-spinner-text">
+      <p>It may take a while for the first time, please wait...</p>
+      <p>首次加载的时间可能会较长，请等待...</p>
+    </div>
+    <div class="jn-spinner "></div>
+    <p class="jn-spinner-text" id="waiting-too-long"></p>
   </div>
-
-  <div id="app" v-cloak>
-    <!-- Nav -->
-    <nav id="navbar-top" class="navbar navbar-expand-lg bg-body-tertiary px-3 mb-3 jn-navbar-top"
-      :class="{ 'dark-mode-nav navbar-dark bg-dark': isDarkMode }">
-      <div class="jn-logo">
-        <a class="navbar-brand" :class="{ 'text-white': isDarkMode }" href="#" @click="handleLogoClick"><i
-            class="bi bi-box-seam-fill"></i>
-          {{currentTexts.nav.Title}}</a>
-        <div class="form-check form-switch">
-          <input class="form-check-input" type="checkbox" role="switch" id="darkModeSwitch" @change="toggleDarkMode"
-            :checked="isDarkMode">
-          <label class="form-check-label" for="darkModeSwitch">
-            <i v-if="isDarkMode" class="bi bi-moon-stars"></i>
-            <i v-else class="bi bi-brightness-high"></i>
-          </label>
-        </div>
-
-      </div>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
-        aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon bg-transparent "></span>
-      </button>
-      <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
-        <div class="navbar-nav ">
-          <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }"
-            href="#scrollspyHeading1">{{currentTexts.nav.IPinfo}}</a>
-          <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }"
-            href="#scrollspyHeading2">{{currentTexts.nav.Connectivity}}</a>
-          <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }"
-            href="#scrollspyHeading3">{{currentTexts.nav.WebRTC}}</a>
-          <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }"
-            href="#scrollspyHeading4">{{currentTexts.nav.DNSLeakTest}}</a>
-        </div>
-      </div>
-    </nav>
-
-
-
-
-    <!-- Proxy Alerts -->
-    <div class="toast-container position-fixed bottom-0 end-0 p-3 jn-toast">
-      <div id="toast" class="toast" :class="{ 'dark-mode': isDarkMode }" role="alert" ref="toast" aria-live="assertive"
-        aria-atomic="true">
-        <div class="toast-header" :class="{ 'dark-mode-title': isDarkMode }">
-          <strong class="me-auto" :class="alertStyle">{{ alertTitle }}</strong>
-          <button type="button" class="btn-close" :class="{ 'dark-mode-close-button': isDarkMode }"
-            data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
-        <div class="toast-body">
-          {{ alertMessage }}
-        </div>
-      </div>
-    </div>
-
-
-    <div class="container mt-5 jn-container">
-      <div data-bs-spy="scroll" data-bs-target="#navbar-top" data-bs-root-margin="0px 0px -40%"
-        data-bs-smooth-scroll="true" class="rounded-2" tabindex="0">
-        <!-- IP Infos -->
-        <div class="ip-data-section mb-4">
-          <div class="row" :class="{'jn-title2': !isMobile,'jn-title':isMobile}">
-            <h2 id="scrollspyHeading1" class="col-4" :class="{'mobile-h2' : isMobile }">🕵️
-              {{currentTexts.ipInfos.Title}}</h2>
-            <div class="form-check form-switch col-8 jn-radio">
-
-              <div :class="{'col-4': isMobile }">
-                <input v-if="isMobile" class="form-check-input" type="checkbox" id="collapseSwitch"
-                  @change="toggleCollapse" :checked="!isCardsCollapsed">
-                <label v-if="isMobile" class="form-check-label" for="collapseSwitch">&nbsp;<i
-                    class="bi bi-list-columns-reverse"></i></label>
-              </div>
-
-              <div>
-                <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault"
-                  @change="toggleMaps" :checked="isMapShown" :disabled="!bingMapAPIKEY">
-
-                <label class="form-check-label" for="flexSwitchCheckDefault">
-                  <i :class="['bi', bingMapAPIKEY ? 'bi bi-map-fill':'bi bi-map']"></i>
-                </label>
-                <i :class="['bi ', !bingMapAPIKEY ? 'bi-plus-circle-fill':'bi-pencil-square']" data-bs-toggle="modal"
-                  data-bs-target="#addBingMapKey"></i>
-
-              </div>
-
-
-
-            </div>
-          </div>
-          <div class="text-secondary">
-            <p>{{currentTexts.ipInfos.Notes}}</p>
-          </div>
-          <div class="jn-card-deck">
-            <div class="row">
-              <div v-for="card in ipDataCards" :key="card.id" :ref="card.id"
-                :class="{'jn-opacity': !card.asn, 'col-xl-4': true, 'col-lg-6': true, 'col-md-6': true, 'mb-4': true}">
-                <div class="card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
-                  <div class="card-header jn-ip-title" :class="{ 'dark-mode-title': isDarkMode }"
-                    style="font-weight: bold;">
-                    <span>{{currentTexts.ipInfos.Source}}: {{ card.source }}</span>
-                    <button @click="refreshCard(card)"
-                      :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']">
-                      <i class="bi bi-arrow-clockwise"></i></button>
-                  </div>
-
-                  <!--  Google Maps iFrame -->
-                  <!-- <iframe class="card-img-top" :src="card.mapUrl" width="100%" height="200" frameborder="0"
-                  style="border:0;" allowfullscreen>
-                </iframe> -->
-
-                  <img v-if="isMapShown" v-if="!isMobile" :src="card.mapUrl" class="card-img-top jn-map-image"
-                    alt="Map">
-                  <div class="card-body">
-                    <ul class="list-group list-group-flush">
-                      <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }"><span
-                          class="jn-text">🖥️ {{currentTexts.ipInfos.IP}}</span>: {{ card.ip
-                        }}
-                      </li>
-                      <li class="list-group-item jn-list-group-item"
-                        :class="{ 'dark-mode': isDarkMode,'mobile-list': isMobile && isCardsCollapsed }">
-                        <span class="jn-text">🌍 {{currentTexts.ipInfos.Country}}</span>: {{
-                        card.country_name }}&nbsp;<span v-if="card.country_code"
-                          :class="'flag-icon flag-icon-' + card.country_code.toLowerCase()"></span>
-                      </li>
-                      <li v-show="!isMobile || !isCardsCollapsed" class="list-group-item jn-list-group-item"
-                        :class="{ 'dark-mode': isDarkMode }"><span class="jn-text">🏚️
-                          {{currentTexts.ipInfos.Region}}</span>: {{ card.region
-                        }}</li>
-                      <li v-show="!isMobile || !isCardsCollapsed" class="list-group-item jn-list-group-item"
-                        :class="{ 'dark-mode': isDarkMode }"><span class="jn-text">🚏
-                          {{currentTexts.ipInfos.City}}</span>: {{ card.city }}
-                      </li>
-                      <li v-show="!isMobile || !isCardsCollapsed" class="list-group-item jn-list-group-item"
-                        :class="{ 'dark-mode': isDarkMode }"><span class="jn-text">🏢
-                          {{currentTexts.ipInfos.ISP}}</span>: {{ card.isp }}
-                      </li>
-                      <li v-show="!isMobile || !isCardsCollapsed" class="list-group-item jn-list-group-item"
-                        :class="{ 'dark-mode': isDarkMode }"><span class="jn-text">📶
-                          {{currentTexts.ipInfos.ASN}}</span>: <a v-if="card.asnlink" :href="card.asnlink"
-                          target="_blank">{{
-                          card.asn }}</a><a v-else>{{
-                          card.asn
-                          }}</a></li>
-                    </ul>
-                  </div>
-
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Connectivity -->
-        <div class="availability-test-section mb-4">
-          <div class="jn-title2">
-            <h2 id="scrollspyHeading2" :class="{'mobile-h2' : isMobile }">🚦 {{currentTexts.connectivity.Title}}</h2>
-            <button @click="checkAllConnectivity(false)"
-              :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']"><i
-                class="bi bi-arrow-clockwise"></i></button>
-          </div>
-          <div class="text-secondary">
-            <p>{{currentTexts.connectivity.Note}}</p>
-          </div>
-          <div class="row">
-            <div v-for="test in connectivityTests" :key="test.id" class="col-6 col-md-3 mb-4">
-              <div class="card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
-                <div class="card-body">
-                  <h5 class="card-title"><i class="bi" :class="'bi-'+test.icon"></i> {{ test.name }}</h5>
-
-                  <p class="card-text"
-                    :class="{'text-info': test.status === currentTexts.connectivity.StatusWait, 'text-success': test.status.includes(currentTexts.connectivity.StatusAvailable), 'text-danger': test.status === currentTexts.connectivity.StatusUnavailable || test.status === currentTexts.connectivity.StatusTimeout}"
-                    v-html="test.status">
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- WebRTC Test -->
-        <div class="webrtc-test-section mb-4">
-          <div class="jn-title2">
-            <h2 id="scrollspyHeading3" :class="{'mobile-h2' : isMobile }">🚥 {{currentTexts.webrtc.Title}}</h2>
-            <button @click="checkAllWebRTC" :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']"><i
-                class="bi bi-arrow-clockwise"></i></button>
-          </div>
-          <div class="text-secondary">
-            <p>{{currentTexts.webrtc.Note}}</p>
-          </div>
-          <div class="row">
-            <div v-for="stun in stunServers" :key="stun.id" class="col-6 col-md-3 mb-4">
-              <div class="card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
-                <div class="card-body">
-                  <h5 class="card-title"><i class="bi bi-sign-merge-left-fill"></i> {{ stun.name }}</h5>
-                  <p class="card-text text-secondary" style="font-size: 10pt;">{{ stun.url }}</p>
-                  <p class="card-text"
-                    :class="{'text-info': stun.ip === currentTexts.webrtc.StatusWait, 'text-success': stun.ip.includes('.'|':'), 'text-danger': stun.ip === currentTexts.webrtc.StatusError}"
-                    v-html="stun.ip"></p>
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- DNS Leaks Test -->
-        <div class="dnsleak-test-section mb-4">
-          <div class="jn-title2">
-            <h2 id="scrollspyHeading4" :class="{'mobile-h2' : isMobile }">🛑 {{currentTexts.dnsleaktest.Title}}</h2>
-            <button @click="checkAllDNSLeakTest"
-              :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']"><i
-                class="bi bi-arrow-clockwise"></i></button>
-          </div>
-          <div class="text-secondary">
-            <p>{{currentTexts.dnsleaktest.Note}}</p>
-            <p>{{currentTexts.dnsleaktest.Note2}}</p>
-          </div>
-          <div class="row">
-            <div v-for="leak in leakTest" :key="leak.id" class="col-6 col-md-3 mb-4">
-              <div class="card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
-                <div class="card-body">
-                  <h5 class="card-title"><i class="bi bi-server"></i> {{ leak.name }}</h5>
-                  <p class="card-text text-secondary" style="font-size: 10pt;">{{currentTexts.dnsleaktest.Endpoint}}: {{
-                    leak.ip }}</p>
-                  <p class="card-text" :class="[
-                        'text-success',
-                        {'text-info': leak.geo === currentTexts.dnsleaktest.StatusWait, 'text-danger': leak.geo.includes('China') || leak.geo.includes('china')}
-                      ]">{{currentTexts.dnsleaktest.EndpointCountry}}: {{ leak.geo }}</p>
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-
-      </div>
-    </div>
-
-    <!-- Info Mask BTN-->
-    <button v-if="isInfosLoaded" class="btn position-fixed"
-      :class="infoMaskLevel === 0 ? 'btn-success' : infoMaskLevel === 1 ? 'btn-warning' : 'btn-secondary'"
-      style="bottom: 66px; right: 20px; z-index: 1050;" @click="toggleInfoMask">
-      <i :class="infoMaskLevel === 0 ? 'bi bi-eye' : 'bi bi-eye-slash'"></i>
-    </button>
-
-    <!-- Search BTN -->
-    <button class="btn btn-primary position-fixed" style="bottom: 20px; right: 20px; z-index: 1050;"
-      data-bs-toggle="modal" data-bs-target="#IPCheck"><i class="bi bi-search"></i></button>
-
-    <!-- Search Modal -->
-    <div class="modal fade" id="IPCheck" tabindex="-1" aria-labelledby="IPCheck" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
-          <div class="modal-header" :class="{ 'dark-mode-border': isDarkMode }">
-            <h5 class="modal-title" id="IPCheck">{{currentTexts.ipcheck.Title}}</h5>
-            <button type="button" class="btn-close" :class="{ 'dark-mode-close-button': isDarkMode }"
-              data-bs-dismiss="modal" aria-label="Close"></button>
-
-          </div>
-          <div class="modal-body" :class="{ 'dark-mode': isDarkMode }">
-            <input type="text" class="form-control mb-2" :class="{ 'dark-mode': isDarkMode }"
-              :placeholder="currentTexts.ipcheck.Placeholder" v-model="inputIP" @keyup.enter="submitQuery">
-            <div v-if="modalQueryError" class="text-danger">{{ modalQueryError }}</div>
-            <div v-if="modalQueryResult" class="mt-2">
-              <div class="card-body">
-                <ul class="list-group list-group-flush">
-                  <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }"><span
-                      class="jn-text">🖥️ {{currentTexts.ipInfos.IP}}</span>: {{
-                    modalQueryResult.ip }}
-                  </li>
-                  <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
-                    <span class="jn-text">🌍 {{currentTexts.ipInfos.Country}}</span>: {{
-                    modalQueryResult.country_name }}&nbsp;<span v-if="modalQueryResult.country_code"
-                      :class="'flag-icon flag-icon-' + modalQueryResult.country_code.toLowerCase()"></span>
-                  </li>
-                  <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }"><span
-                      class="jn-text">🏚️ {{currentTexts.ipInfos.Region}}</span>: {{
-                    modalQueryResult.region
-                    }}</li>
-                  <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }"><span
-                      class="jn-text">🚏 {{currentTexts.ipInfos.City}}</span>: {{
-                    modalQueryResult.city }}
-                  </li>
-                  <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }"><span
-                      class="jn-text">🏢 {{currentTexts.ipInfos.ISP}}</span>: {{
-                    modalQueryResult.isp }}
-                  </li>
-                  <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }"><span
-                      class="jn-text">📶 {{currentTexts.ipInfos.ASN}}</span>: <a v-if="modalQueryResult.asnlink"
-                      :href="modalQueryResult.asnlink" target="_blank">{{
-                      modalQueryResult.asn }}</a><a v-else>{{ modalQueryResult.asn
-                      }}</a></li>
-                </ul>
-              </div>
-
-            </div>
-          </div>
-          <div class="modal-footer" :class="{ 'dark-mode-border': isDarkMode }">
-            <button type="button" class="btn btn-primary"
-              :class="{ 'btn-secondary': !isValidIP(inputIP), 'btn-primary': isValidIP(inputIP) }" @click="submitQuery"
-              :disabled="!isValidIP(inputIP)">{{currentTexts.ipcheck.Button}}</button>
-
-          </div>
-
-        </div>
-      </div>
-    </div>
-
-    <!-- BingMap Modal -->
-    <div class="modal fade" id="addBingMapKey" tabindex="-1" aria-labelledby="addBingMapKey" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
-          <div class="modal-header" :class="{ 'dark-mode-border': isDarkMode }">
-            <h5 class="modal-title" id="addBingMapKey">{{currentTexts.addBingMapKey.Title}}</h5>
-            <button type="button" class="btn-close" :class="{ 'dark-mode-close-button': isDarkMode }"
-              data-bs-dismiss="modal" aria-label="Close"></button>
-
-          </div>
-          <div class="modal-body" :class="{ 'dark-mode': isDarkMode }">
-            <p class="fw-light">{{ currentTexts.addBingMapKey.Note }}</p>
-            <input type="text" class="form-control mb-2" :class="{ 'dark-mode': isDarkMode }"
-              :placeholder="currentTexts.addBingMapKey.Placeholder" v-model="inputBingMapAPIKEY"
-              @keyup.enter="addBingMapKey">
-            <div v-if="bingMapAPIKEYError" class="text-danger">{{ currentTexts.addBingMapKey.Error }}</div>
-
-
-          </div>
-          <div class="modal-footer" :class="{ 'dark-mode-border': isDarkMode }">
-            <button v-if="bingMapAPIKEY" type="button" class="btn btn-danger"
-              @click="removeBingMapKey">{{currentTexts.addBingMapKey.removeButton}}</button>
-
-            <button type="button" class="btn btn-primary"
-              :class="{ 'btn-secondary': !isValidKey(inputBingMapAPIKEY), 'btn-primary': isValidKey(inputBingMapAPIKEY) }"
-              @click="addBingMapKey"
-              :disabled="!isValidKey(inputBingMapAPIKEY)">{{currentTexts.addBingMapKey.Button}}</button>
-
-          </div>
-
-        </div>
-      </div>
-    </div>
-
-    <!-- help modal -->
-    <div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModal" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
-          <div class="modal-header" :class="{ 'dark-mode-border': isDarkMode }">
-            <h5 class="modal-title" id="helpModal">{{currentTexts.helpModal.Title}}</h5>
-            <button type="button" class="btn-close" :class="{ 'dark-mode-close-button': isDarkMode }"
-              data-bs-dismiss="modal" aria-label="Close"></button>
-
-          </div>
-          <div class="modal-body" :class="{'dark-mode' : isDarkMode }">
-            <div v-for="key in keyMap" :key="key.keys" class="row p-2 jn-shortcut-row"
-              :class="[ isDarkMode ? 'border-dark-subtle jn-dark-mode-help-border': 'border-light-subtle' ]">
-              <div class="col">
-                <kbd :class="{ 'text-bg-light':isDarkMode}">
-                  {{ key.keys.replace(/[\\\(\)]/g, '') }}
-                </kbd>
-              </div>
-              <div class="col-8">{{ key.description }}</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-
-    <footer>
-      <p class="text-center">Creators: Jason Ng, Seven Yu & ChatGPT <a href="https://github.com/jason5ng32/MyIP" class="link-dark"
-          target="_blank"><i class="bi bi-github" :class="{ 'dark-mode': isDarkMode }"></i></a>
-      </p>
-    </footer>
-
-  </div>
-
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"
-    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
-    crossorigin="anonymous"></script>
-
-  <!-- 引入 Vue.js -->
-  <script src="res/vue.js"></script>
-  <script type="module" src="res/app.js"></script>
-
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', function () {
-        navigator.serviceWorker.register('service-worker.js').then(function (registration) {
-          console.log('ServiceWorker Success : ', registration.scope);
-        }, function (err) {
-          console.log('ServiceWorker Error: ', err);
-        });
-      });
-    }
-  </script>
-
+  <div id="app"></div>
+  <script type="module" src="/frontend/main.js"></script>
 </body>
 
 </html>
